@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.13
+    commands:
+      - echo "Starting install phase for Python..."
+      - pip install -r requirements.txt # Install dependencies from requirements.txt
+      - echo "Install phase completed."
+  pre_build:
+    commands:
+      - echo "Starting pre-build phase..."
+      - echo "Pre-build phase completed."
+  build:
+    commands:
+      - echo "Starting build phase..."
+      - echo "Packaging the Lambda function..."
+      - echo "Build phase completed."
+  post_build:
+    commands:
+      - echo "Starting post-build phase..."
+      - echo "Packaging the Lambda function using SAM CLI..."
+      - sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket web-site-pak-nikolai --region eu-north-1
+      - echo "Packaging completed."
+      - echo "Post-build phase completed."
+artifacts:
+  type: zip
+  files:
+    - packaged.yaml

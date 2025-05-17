@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM application for lambda
+
+Parameters:
+  SQSQueueArn:
+    Type: String
+    Description: The ARN of the SQS Queue
+  
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_sqs_to_sns.lambda_handler
+      CodeUri: lambdas/
+      Runtime: python3.13
+      Architectures:
+        - x86_64
+      Timeout: 10
+      Policies:
+      - AWSLambda_FullAccess
+      - AWSLambdaSQSQueueExecutionRole
+      - AmazonSNSFullAccess
+      - AmazonSQSFullAccess
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Canary10Percent10Minutes
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Ref SQSQueueArn
+            BatchSize: 10
