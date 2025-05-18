@@ -5,7 +5,6 @@ import boto3
 sns_client = boto3.client('sns')
 sns_info = {}
 sns_info["SNS_TOPIC_ARN"] = "arn:aws:sns:eu-north-1:971422678291:web-app-UploadsNotificationTopic"
-
 def process_sqs_messages(messages):
     print("Processing SQS messages...")
 
