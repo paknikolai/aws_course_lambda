@@ -30,7 +30,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - 'lambda:InvokeFunction'
-                Resource: !Sub 'arn:aws:lambda:eu-north-1:971422678291:function:${Function}'
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - 'sqs:ReceiveMessage'
@@ -41,6 +41,7 @@ Resources:
                 Action:
                   - 'sns:Publish'
                 Resource: 'arn:aws:sns:eu-north-1:971422678291:*'
+
   Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -50,18 +51,19 @@ Resources:
       Architectures:
         - x86_64
       Timeout: 10
-      Role: !GetAtt LambdaExecutionRole.Arn 
+      Role: !GetAtt LambdaExecutionRole.Arn
       Policies:
-      - AWSLambda_FullAccess
-      - AWSLambdaSQSQueueExecutionRole
-      - AmazonSNSFullAccess
-      - AmazonSQSFullAccess
+        - AWSLambda_FullAccess
+        - AWSLambdaSQSQueueExecutionRole
+        - AmazonSNSFullAccess
+        - AmazonSQSFullAccess
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Canary10Percent10Minutes
-      Events:
-        MySQSEvent:
-          Type: SQS
-          Properties:
-            Queue: !Ref SQSQueueArn
-            BatchSize: 10
+
+  SqsEventMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      EventSourceArn: !Ref SQSQueueArn
+      FunctionName: !Ref Function
